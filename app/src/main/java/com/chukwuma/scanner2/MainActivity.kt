@@ -283,6 +283,7 @@ class MainActivity : AppCompatActivity() {
         when(requestCode) {
             CAMERA_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty()) {
+                    grantResults.forEach { x -> println(x) }
                     val cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     val storageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
                     if (cameraAccepted && storageAccepted) pickImageCamera();
@@ -290,6 +291,7 @@ class MainActivity : AppCompatActivity() {
             }
             STORAGE_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty()) {
+                    grantResults.forEach { x -> println(x) }
                     val storageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     if (storageAccepted) pickImageCamera();
                 } else showToast("Storage permission are required...")
