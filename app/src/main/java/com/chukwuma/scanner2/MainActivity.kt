@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun detectImageFromImage() {
-        Log.d(TAG, "detectRsultFromImage: ")
+        Log.d(TAG, "detectResultFromImage: ")
         try {
             val inputImage = InputImage.fromFilePath(this, imageUri!!);
             val barcodeResult = barCodeScanner!!.process(inputImage)
@@ -233,6 +233,7 @@ class MainActivity : AppCompatActivity() {
         imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        cameraActivityResultLauncher.launch(intent);
     }
 
     private val cameraActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -270,7 +271,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestCameraPermission () {
-        ActivityCompat.requestPermissions(this, storagePermissions, CAMERA_REQUEST_CODE);
+        ActivityCompat.requestPermissions(this, cameraPermissions, CAMERA_REQUEST_CODE);
     }
 
     override fun onRequestPermissionsResult(
