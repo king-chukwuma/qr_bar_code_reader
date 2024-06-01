@@ -26,21 +26,37 @@
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/cameraBtn"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Camera"-->
+<!--                android:layout_marginEnd="5dp"-->
+<!--                android:layout_weight="1"/>-->
+
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/cameraBtn"
+                android:id="@+id/checkInBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Camera"
+                android:text="CheckIn"
                 android:layout_marginEnd="5dp"
                 android:layout_weight="1"/>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/galleryBtn"
+                android:id="@+id/checkOutBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Gallery"
+                android:text="CheckOut"
                 android:layout_marginEnd="5dp"
                 android:layout_weight="1"/>
+
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/galleryBtn"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Gallery"-->
+<!--                android:layout_marginEnd="5dp"-->
+<!--                android:layout_weight="1"/>-->
 
         </LinearLayout>
         
@@ -52,22 +68,22 @@
             android:src="@drawable/ic_android_black_24dp"
             android:adjustViewBounds="true"/>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/scanBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Scan"/>
+<!--        <com.google.android.material.button.MaterialButton-->
+<!--            android:id="@+id/scanBtn"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Scan"/>-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/TextAppearance.MaterialComponents.Body1"
-            android:text="Result: "/>
+<!--        <TextView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            style="@style/TextAppearance.MaterialComponents.Body1"-->
+<!--            android:text="Result: "/>-->
 
-        <TextView
-            android:id="@+id/resultTv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+<!--        <TextView-->
+<!--            android:id="@+id/resultTv"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"/>-->
     </LinearLayout>
 
 </ScrollView>
