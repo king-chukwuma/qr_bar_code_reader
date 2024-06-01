@@ -1,4 +1,4 @@
-package com.chukwuma.scanner2.service
+package com.chukwuma.MOFI.service
 
 object BackendRoutes {
 

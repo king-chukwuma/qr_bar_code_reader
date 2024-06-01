@@ -1,12 +1,9 @@
-package com.chukwuma.scanner2.service
+package com.chukwuma.MOFI.service
 
-import com.chukwuma.scanner2.dto.CheckInResponse
+import com.chukwuma.MOFI.dto.CheckInResponse
 import io.ktor.client.HttpClient
-import io.ktor.client.features.json.defaultSerializer
-import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.url
-import kotlinx.serialization.serializer
 
 class InvitationServiceImpl (private val client: HttpClient) : InvitationService {
 

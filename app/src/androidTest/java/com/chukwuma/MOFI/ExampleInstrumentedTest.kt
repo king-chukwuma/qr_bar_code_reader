@@ -1,4 +1,4 @@
-package com.chukwuma.scanner2
+package com.chukwuma.MOFI
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

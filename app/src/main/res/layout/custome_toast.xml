@@ -11,6 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
-        android:textSize="60dp"
+        android:textSize="45dp"
         android:text="Custom Toast Message"/>
 </LinearLayout>

@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Scanner2</string>
+    <string name="app_name">MOFI Invite Scanner</string>
+    <string name="failed">Failed!!!</string>
+    <string name="successful">Successful!!!</string>
 </resources>

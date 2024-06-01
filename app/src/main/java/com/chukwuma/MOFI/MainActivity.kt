@@ -1,4 +1,4 @@
-package com.chukwuma.scanner2
+package com.chukwuma.MOFI
 
 import android.Manifest
 import android.app.Activity
@@ -22,8 +22,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.chukwuma.scanner2.dto.CheckInResponse
-import com.chukwuma.scanner2.service.InvitationService
+import com.chukwuma.MOFI.dto.CheckInResponse
+import com.chukwuma.MOFI.service.InvitationService
 import com.google.android.material.button.MaterialButton
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -38,13 +38,9 @@ class MainActivity : AppCompatActivity() {
     private val backendService = InvitationService.create();
 
     // UI Views
-//    private lateinit var cameraBtn: MaterialButton;
     private lateinit var checkInBtn: MaterialButton;
     private lateinit var checkOutBtn: MaterialButton;
-//    private lateinit var galleryBtn: MaterialButton;
     private lateinit var imageIv: ImageView;
-    private lateinit var scanBtn: MaterialButton;
-    private lateinit var resultTv: TextView;
 
     companion object {
         private const val CAMERA_REQUEST_CODE = 100;
@@ -65,15 +61,10 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-
         // Init UI Views
-//        cameraBtn = findViewById(R.id.cameraBtn);
-//        galleryBtn = findViewById(R.id.galleryBtn);
         checkInBtn = findViewById(R.id.checkInBtn);
         checkOutBtn = findViewById(R.id.checkOutBtn);
         imageIv = findViewById(R.id.imageIv);
-//        scanBtn = findViewById(R.id.scanBtn);
-//        resultTv = findViewById(R.id.resultTv);
 
         cameraPermissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         storagePermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -86,12 +77,6 @@ class MainActivity : AppCompatActivity() {
         checkInBtn.cornerRadius = 0
         checkOutBtn.cornerRadius = 0
 
-
-//        cameraBtn.setOnClickListener{
-//            if (checkCameraPermission()) pickImageCamera();
-//            else requestCameraPermission();
-//        }
-
         checkInBtn.setOnClickListener{
             if (checkCameraPermission()) {
                 pickImageCameraCheckIn()
@@ -101,8 +86,6 @@ class MainActivity : AppCompatActivity() {
             };
         }
 
-//        checkInBtn.afte
-
         checkOutBtn.setOnClickListener{
             if (checkCameraPermission()) {
                 pickImageCameraCheckOut()
@@ -111,13 +94,6 @@ class MainActivity : AppCompatActivity() {
                 requestCameraPermission()
             };
         }
-//        galleryBtn.setOnClickListener{
-//            if (checkStoragePermission()) pickImageGallery()
-//            else requestStoragePermission()
-//        }
-//        scanBtn.setOnClickListener{
-//            scan();
-//        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -161,17 +137,7 @@ class MainActivity : AppCompatActivity() {
             val x = rawValue?.replace("\n", "\\n");
             val y = x?.split("\\n\\n")?.get(2)
 
-//            val valueType = barcode.valueType;
-
             call(y, isCheckIn)
-
-//            when (valueType) {
-//                Barcode.TYPE_WIFI -> handleTypeWifi(barcode, rawValue);
-//                Barcode.TYPE_URL -> handleTypeUrl(barcode, rawValue);
-//                Barcode.TYPE_EMAIL -> handleTypeEmail(barcode, rawValue);
-//                Barcode.TYPE_CONTACT_INFO -> handleTypeContactInfo(barcode, rawValue);
-//                else -> call(y);
-//            }
         }
     }
 
@@ -188,96 +154,8 @@ class MainActivity : AppCompatActivity() {
             if (checkInResponse.successful) (run {
                 showCustomToastSuccess();
             }) else showCustomToastFailed()
-
-
         }
 
-    }
-
-    private fun handleTypeContactInfo(barcode: Barcode, rawValue: String?) {
-        val typeContactInfo = barcode.contactInfo
-
-        val title = "${typeContactInfo?.title}"
-        val organization = "${typeContactInfo?.organization}"
-        val name = "${typeContactInfo?.name?.first} ${typeContactInfo?.name?.last} "
-        val phone = "${typeContactInfo?.name?.first} ${typeContactInfo?.phones?.get(0)?.number}"
-
-        resultTv.text =
-            "TYPE_CONTACT_INFO \ntitle: $title \norganization: $organization \nname: $name \n\nphone: $phone \n\nrawValue: $rawValue"
-
-    }
-
-    private fun handleTypeEmail(barcode: Barcode, rawValue: String?) {
-        val typeEmail = barcode.email
-
-        val address =  "${typeEmail?.address}"
-        val body =  "${typeEmail?.body}"
-        val subject =  "${typeEmail?.subject}"
-
-        Log.d(TAG, "extractBarCodeQrCodeInfo: TYPE_EMAIL")
-        Log.d(TAG, "extractBarCodeQrCodeInfo: address: $address")
-        Log.d(TAG, "extractBarCodeQrCodeInfo: body: $body")
-        Log.d(TAG, "extractBarCodeQrCodeInfo: subject: $subject")
-
-        resultTv.text =
-            "TYPE_EMAIL \nemail: $address \nsubject: $subject \n\nbody: $body \n\nrawValue: $rawValue"
-    }
-
-    private fun handleTypeUrl(barcode: Barcode, rawValue: String?) {
-        val typeUrl = barcode.url;
-
-        val title = "${typeUrl?.title}"
-        val url = "${typeUrl?.url}"
-
-        Log.d(TAG, "extractBarCodeQrCodeInfo: TYPE_URL")
-        Log.d(TAG, "extractBarCodeQrCodeInfo: title: $title")
-        Log.d(TAG, "extractBarCodeQrCodeInfo: url: $url")
-
-        resultTv.text =
-            "TYPE_URL \ntitle: $title \nurl: $url \n\nrawValue: $rawValue"
-    }
-
-    private fun handleTypeWifi(
-        barcode: Barcode,
-        rawValue: String?
-    ) {
-        val typeWifi = barcode.wifi
-
-        val ssid = "${typeWifi?.ssid}"
-        val password = "${typeWifi?.password}"
-        var encryptionType = "${typeWifi?.encryptionType}"
-
-        if (encryptionType == "1") {
-            encryptionType = "OPEN"
-        } else if (encryptionType == "2") {
-            encryptionType = "WPA"
-        } else if (encryptionType == "3") {
-            encryptionType = "WEP"
-        }
-
-        Log.d(TAG, "extractBarCodeQrCodeInfo: TYPE_WIFI")
-        Log.d(TAG, "extractBarCodeQrCodeInfo: :ssid $ssid")
-        Log.d(TAG, "extractBarCodeQrCodeInfo: :password $password")
-        Log.d(TAG, "extractBarCodeQrCodeInfo: :encryptionType $encryptionType")
-
-        resultTv.text =
-            "TYPE_WIFI \nssid: $ssid \npassword: $password \nencryptionType: $encryptionType\n\nrawValue: $rawValue"
-    }
-
-    private fun pickImageGallery() {
-        val intent = Intent(Intent.ACTION_PICK);
-        intent.type = "image/*"
-        galleryActivityResultLauncher.launch(intent);
-    }
-
-    private val galleryActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-
-        result -> if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data;
-                imageUri = data?.data
-                Log.d(TAG, ": imageUri: $imageUri");
-                imageIv.setImageURI(imageUri);
-        } else showToast("Canceled!!!")
     }
 
     private fun pickImageCameraCheckIn () {
@@ -320,18 +198,6 @@ class MainActivity : AppCompatActivity() {
             imageIv.setImageURI(imageUri)
             scan(false)
         }
-    }
-
-    private fun checkStoragePermission (): Boolean {
-        val result = ContextCompat.checkSelfPermission(
-            this,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
-        return result
-    }
-
-    private fun requestStoragePermission () {
-        ActivityCompat.requestPermissions(this, storagePermissions, STORAGE_REQUEST_CODE);
     }
 
     private fun checkCameraPermission (): Boolean {
@@ -395,7 +261,7 @@ class MainActivity : AppCompatActivity() {
 
         // Find the TextView in the custom layout and set the message
         val textView: TextView = layout.findViewById(R.id.toast_text)
-        textView.text = "Successful!!!"
+        textView.text = getString(R.string.successful)
         textView.setTextColor(Color.GREEN)
 
         // Create and display the toast
@@ -413,7 +279,7 @@ class MainActivity : AppCompatActivity() {
 
         // Find the TextView in the custom layout and set the message
         val textView: TextView = layout.findViewById(R.id.toast_text)
-        textView.text = "Failed!!!"
+        textView.text = getString(R.string.failed)
         textView.setTextColor(Color.RED)
 
         // Create and display the toast

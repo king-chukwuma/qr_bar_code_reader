@@ -1,4 +1,4 @@
-package com.chukwuma.scanner2
+package com.chukwuma.MOFI
 
 import org.junit.Test
 
