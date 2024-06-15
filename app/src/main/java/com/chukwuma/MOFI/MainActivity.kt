@@ -44,12 +44,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val CAMERA_REQUEST_CODE = 100;
-        private const val STORAGE_REQUEST_CODE = 101;
         private const val TAG = "MAIN_TAG";
     }
 
     private lateinit var cameraPermissions: Array<String>
-    private lateinit var storagePermissions: Array<String>
 
     private var imageUri: Uri? = null;
     private var barCodeScannerOptions: BarcodeScannerOptions? = null
@@ -67,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         imageIv = findViewById(R.id.imageIv);
 
         cameraPermissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        storagePermissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         barCodeScannerOptions = BarcodeScannerOptions.Builder()
             .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
@@ -210,7 +207,7 @@ class MainActivity : AppCompatActivity() {
             this,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
-        return resultCamera && resultStorage;
+        return resultCamera;
     }
 
     private fun requestCameraPermission () {
@@ -229,20 +226,11 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty()) {
                     grantResults.forEach { x -> println(x) }
                     val cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    val storageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    if (cameraAccepted && storageAccepted) pickImageCameraCheckIn();
+                    if (cameraAccepted) pickImageCameraCheckIn();
                 } else showToast("Camera & Storage permissions are required")
-            }
-            STORAGE_REQUEST_CODE -> {
-                if (grantResults.isNotEmpty()) {
-                    grantResults.forEach { x -> println(x) }
-                    val storageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    if (storageAccepted) pickImageCameraCheckIn();
-                } else showToast("Storage permission are required...")
             }
         }
     }
-
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
@@ -289,6 +277,4 @@ class MainActivity : AppCompatActivity() {
             show()
         }
     }
-
-
 }
