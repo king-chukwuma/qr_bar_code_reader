@@ -1,14 +1,9 @@
 package com.chukwuma.MOFI
 
 import android.Manifest
-import android.app.Activity
-import android.content.ContentValues
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +11,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -25,13 +19,10 @@ import androidx.core.view.WindowInsetsCompat
 import com.chukwuma.MOFI.dto.CheckInResponse
 import com.chukwuma.MOFI.service.InvitationService
 import com.google.android.material.button.MaterialButton
-import com.google.mlkit.vision.barcode.BarcodeScanner
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.common.InputImage
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.runBlocking
-import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,15 +35,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val CAMERA_REQUEST_CODE = 100;
-        private const val TAG = "MAIN_TAG";
     }
 
     private lateinit var cameraPermissions: Array<String>
-
-    private var imageUri: Uri? = null;
-    private var barCodeScannerOptions: BarcodeScannerOptions? = null
-    private var barCodeScanner: BarcodeScanner? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,12 +49,12 @@ class MainActivity : AppCompatActivity() {
         checkOutBtn = findViewById(R.id.checkOutBtn);
         imageIv = findViewById(R.id.imageIv);
 
-        cameraPermissions = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        cameraPermissions = arrayOf(Manifest.permission.CAMERA);
 
-        barCodeScannerOptions = BarcodeScannerOptions.Builder()
-            .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
-            .build();
-        barCodeScanner = BarcodeScanning.getClient(barCodeScannerOptions!!)
+//        barCodeScannerOptions = BarcodeScannerOptions.Builder()
+//            .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+//            .build();
+//        barCodeScanner = BarcodeScanning.getClient(barCodeScannerOptions!!)
 
         checkInBtn.cornerRadius = 0
         checkOutBtn.cornerRadius = 0
@@ -99,45 +84,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun scan(isCheckIn: Boolean) {
-        if (imageUri == null) showToast("Pick Image First");
-        else detectImageFromImage(isCheckIn)
-    }
-
-    private fun detectImageFromImage(isCheckIn: Boolean) {
-        Log.d(TAG, "detectResultFromImage: ")
-        try {
-            val inputImage = InputImage.fromFilePath(this, imageUri!!);
-            barCodeScanner!!.process(inputImage)
-                .addOnSuccessListener { barcodes ->
-                    extractInfoFromQRCode(barcodes, isCheckIn);
-
-                }
-                .addOnFailureListener {e ->
-                    Log.e(TAG, "detectImageFromImage: ", e);
-                    showToast("Failed scanning due to ${e.message}")
-                }
-        } catch (e: Exception) {
-            Log.e(TAG, "detectImageFromImage: ", e );
-            showToast("Failed due to ${e.message}")
-        }
-    }
-
-    private fun extractInfoFromQRCode(barcodes: List<Barcode>, isCheckIn: Boolean) {
-        for (barcode in barcodes) {
-            val bound = barcode.boundingBox;
-            val corners = barcode.cornerPoints;
-
-            val rawValue = barcode.rawValue;
-            Log.d(TAG, "extractBarCodeQrCodeInfo: rawValue: $rawValue");
-
-            val x = rawValue?.replace("\n", "\\n");
-            val y = x?.split("\\n\\n")?.get(2)
-
-            call(y, isCheckIn)
-        }
-    }
-
     private fun call(id: String?, isCheckIn: Boolean) {
 
         runBlocking {
@@ -150,50 +96,46 @@ class MainActivity : AppCompatActivity() {
 
             if (checkInResponse.successful) (run {
                 showCustomToastSuccess();
-            }) else showCustomToastFailed()
+            }) else showCustomToastFailed(checkInResponse.message)
         }
 
     }
 
     private fun pickImageCameraCheckIn () {
-        val contentValues = ContentValues();
-        contentValues.put(MediaStore.Images.Media.TITLE, "Sample Image");
-        contentValues.put(MediaStore.Images.Media.DESCRIPTION, "Sample Image Description");
-
-        imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        cameraActivityResultLauncher.launch(intent);
+        cameraActivityResultLauncher.launch(ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE))
     }
 
-    private val cameraActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data;
-                Log.d(TAG, "cameraActivityResultLauncher :imageUri: $imageUri");
-                imageIv.setImageURI(imageUri)
-                scan(true)
-            }
+    private val cameraActivityResultLauncher = registerForActivityResult<ScanOptions, ScanIntentResult>(ScanContract()) {
+            result ->
+
+        if (result.contents == null) {
+            Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show()
+        } else {
+            val content = result.contents
+            val x = content?.replace("\n", "\\n");
+            val y = x?.split("\\n\\n")?.get(2)
+
+            Log.d("UUID Invite", y.toString())
+
+            call(y, true)
+        }
     }
 
     private fun pickImageCameraCheckOut () {
-        val contentValues = ContentValues();
-        contentValues.put(MediaStore.Images.Media.TITLE, "Sample Image");
-        contentValues.put(MediaStore.Images.Media.DESCRIPTION, "Sample Image Description");
-
-        imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        cameraActivityResultLauncher2.launch(intent);
+        cameraActivityResultLauncher2.launch(ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE));
     }
 
-    private val cameraActivityResultLauncher2 = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    private val cameraActivityResultLauncher2 = registerForActivityResult<ScanOptions, ScanIntentResult>(ScanContract()) {
             result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data;
-            Log.d(TAG, "cameraActivityResultLauncher :imageUri: $imageUri");
-            imageIv.setImageURI(imageUri)
-            scan(false)
+
+        if (result.contents != null) {
+            val content = result.contents
+            val x = content?.replace("\n", "\\n");
+            val y = x?.split("\\n\\n")?.get(2)
+
+            Log.d("UUID Invite", y.toString())
+
+            call(y, false)
         }
     }
 
@@ -227,19 +169,13 @@ class MainActivity : AppCompatActivity() {
                     grantResults.forEach { x -> println(x) }
                     val cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     if (cameraAccepted) pickImageCameraCheckIn();
-                } else showToast("Camera & Storage permissions are required")
+                } else showToast("Camera is required")
             }
         }
     }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private fun showToastResult(message: String) {
-        Toast
-            .makeText(this, message, Toast.LENGTH_LONG)
-            .show();
     }
 
     private fun showCustomToastSuccess() {
@@ -260,14 +196,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showCustomToastFailed() {
+    private fun showCustomToastFailed(reason: String?) {
         // Inflate the custom layout
         val inflater: LayoutInflater = layoutInflater
         val layout: View = inflater.inflate(R.layout.custome_toast, findViewById(R.id.custom_toast_container))
 
         // Find the TextView in the custom layout and set the message
         val textView: TextView = layout.findViewById(R.id.toast_text)
-        textView.text = getString(R.string.failed)
+        textView.text = reason
         textView.setTextColor(Color.RED)
 
         // Create and display the toast

@@ -3,10 +3,12 @@ package com.chukwuma.MOFI.service
 import com.chukwuma.MOFI.dto.CheckInResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
-import io.ktor.client.features.logging.LogLevel
-import io.ktor.client.features.logging.Logging
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.ContentType.Application.Json
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 
 interface InvitationService {
 
@@ -18,10 +20,14 @@ interface InvitationService {
             return InvitationServiceImpl (
                 client = HttpClient(Android) {
                     install(Logging) {
-                        level = LogLevel.BODY
+                        level = LogLevel.ALL
                     }
-                    install (JsonFeature) {
-                        serializer = KotlinxSerializer()
+                    install(ContentNegotiation) {
+                        json(json = Json {
+                            prettyPrint = true
+                            isLenient = true
+                            ignoreUnknownKeys = true
+                        })
                     }
                 }
             )

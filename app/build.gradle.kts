@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias (libs.plugins.kotlinSerialization)
 }
 
 android {
@@ -43,14 +44,18 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation ("com.google.mlkit:barcode-scanning:17.0.2")
     implementation(libs.androidx.constraintlayout)
+//    implementation(libs.qr.scanner)
+    implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation ("io.ktor:ktor-client-core:1.6.3")
-    implementation ("io.ktor:ktor-client-android:1.6.3")
-    implementation ("io.ktor:ktor-client-serialization:1.6.3")
-    implementation ("io.ktor:ktor-client-logging:1.6.3")
+    implementation ("io.ktor:ktor-client-core:2.3.12")
+    implementation ("io.ktor:ktor-client-android:2.3.12")
+    implementation ("io.ktor:ktor-client-serialization:2.3.12")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+    implementation ("io.ktor:ktor-client-logging:2.3.12")
     implementation ("ch.qos.logback:logback-classic:1.2.3")
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
 }
